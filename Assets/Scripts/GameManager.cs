@@ -1,14 +1,13 @@
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private LivesDisplay livesDisplay;
-
+    [SerializeField] private UIManager uiManager;
+    [SerializeField] private int playerLives = 3;
     // Simple singleton script. This is the easiest way to create and understand a singleton script.
     
-    [SerializeField] private int lives = 3;
-
     private void Awake()
     {
         var numGameManager = FindObjectsOfType<GameManager>().Length;
@@ -23,34 +22,44 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        UpdateLives();
+    }
+    
     public void ProcessPlayerDeath()
     {
-        lives -= 1;
-
-        if (lives == 0)
+        playerLives--;
+        
+        switch (playerLives)
         {
-        SceneManager.LoadScene(0);
-        Destroy(gameObject);    
-        }
-
-        else
-        {  
-            Debug.Log(lives);
-            livesDisplay.UpdateScore(lives);
-            SceneManager.LoadScene(GetCurrentBuildIndex());
+            case >= 1:
+                LoadScene(GetCurrentBuildIndex());
+                UpdateLives();
+                break;
+            default:
+                ReturnToMainMenu();
+                break;
         }
     }
 
+    public void ReturnToMainMenu()
+    {
+        LoadScene(0);
+        Destroy(gameObject);
+        
+    }
+    
     public void LoadNextLevel()
     {
         var nextSceneIndex = GetCurrentBuildIndex() + 1;
         
         if (nextSceneIndex == SceneManager.sceneCountInBuildSettings)
         {
-            nextSceneIndex = 0;
+            nextSceneIndex = 1;
         }
         
-        SceneManager.LoadScene(nextSceneIndex);
+        LoadScene(nextSceneIndex);
     }
 
     private int GetCurrentBuildIndex()
@@ -58,14 +67,15 @@ public class GameManager : MonoBehaviour
         return SceneManager.GetActiveScene().buildIndex;
     }
 
-    public void GotoMainScene()
+    private void LoadScene(int buildIndex)
     {
-        SceneManager.LoadScene(0);
-        Destroy(gameObject);
+        SceneManager.LoadScene(buildIndex);
+        DOTween.KillAll();
     }
 
-    public GameObject[] hearts;
-    public int life;
-    private bool dead;
+    private void UpdateLives()
+    {
+        uiManager.UpdateLives(playerLives);
 
+    }
 }

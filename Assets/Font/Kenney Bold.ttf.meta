@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 256947dae3513ef4595d79fcc5af29cc
+guid: cdaedd6a8bbf3fc47a704525cb7bcd55
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - lucy
+  - Kenney Bold
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0

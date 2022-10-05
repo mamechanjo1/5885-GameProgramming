@@ -1,28 +1,28 @@
 using System.Collections;
-using UnityEngine.EventSystems;
 using UnityEngine;
-using DG.Tweening;
 
 public class CollectibleSpawner : MonoBehaviour
 {
     // This script is to handle the respawning of the collectible as a disabled gameObject cannot run any methods or coroutines on its own.
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private GameObject collectibleGameObject;
-    [SerializeField] private Transform EndMovePoint;
+    [SerializeField] private AudioSource respawnedSound;
     
     [Header("Collectible Settings")]
     [SerializeField] private float respawnTime = 4f;
 
     private void Start()
     {
-        transform.DOMove(EndMovePoint.position, 3f).SetEase(Ease.InOutBack).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutQuad);
+        spriteRenderer.enabled = false;
     }
-
+    
     private IEnumerator RespawnCollectible()
     {
         yield return new WaitForSeconds(respawnTime);
         SetOutlineSpriteActive(false);
         collectibleGameObject.SetActive(true);
+        respawnedSound.Play();
+        
     }
 
     private void SetOutlineSpriteActive(bool state)
@@ -39,5 +39,6 @@ public class CollectibleSpawner : MonoBehaviour
     {
         SetOutlineSpriteActive(true);
         StartCoroutine(RespawnCollectible());
+        
     }
 }

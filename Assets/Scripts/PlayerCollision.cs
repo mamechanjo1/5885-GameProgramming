@@ -3,6 +3,8 @@ using UnityEngine;
 public class PlayerCollision : MonoBehaviour
 {
     [SerializeField] private PlayerController playerController;
+    [SerializeField] private AudioSource collectibleSound;
+    [SerializeField] private AudioSource groundSound;
 
     private Collider2D _playerCollider;
     private void Start()
@@ -16,6 +18,7 @@ public class PlayerCollision : MonoBehaviour
         {
             playerController.Jump(jumpPad.GetJumpPadForce(), jumpPad.GetAdditionalSleepJumpTime());
             jumpPad.TriggerJumpPad();
+            
         }
         else if (col.TryGetComponent(out Collectibles collectible))
         {
@@ -34,6 +37,7 @@ public class PlayerCollision : MonoBehaviour
             }
             
             Debug.Log(collectibleType);
+            collectibleSound.Play();
         }
 
         if (_playerCollider.IsTouchingLayers(LayerMask.GetMask("Hazard")))
@@ -62,5 +66,13 @@ public class PlayerCollision : MonoBehaviour
             }*/
 
         #endregion
+    }
+
+    private void OnCollisionEnter2D(Collision2D col)
+    {
+        if(_playerCollider.IsTouchingLayers(LayerMask.GetMask("Ground")))
+        {
+            groundSound.Play();
+        }
     }
 }

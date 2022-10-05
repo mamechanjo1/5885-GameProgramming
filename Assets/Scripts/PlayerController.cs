@@ -1,8 +1,6 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Collections;
-using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,6 +9,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Collider2D playerCollider;
     [SerializeField] private PlayerAnimatorController animatorController;
+    [SerializeField] private PlayerAudioController audioController;
+    [SerializeField] private AudioSource hurtSound;
 
     [Header("Player Values")] 
     [SerializeField] private float movementSpeed = 3f;
@@ -37,10 +37,6 @@ public class PlayerController : MonoBehaviour
     // Stored References
     private GameManager _gameManager;
 
-    private void Start()
-    {
-        _gameManager = FindObjectOfType<GameManager>();
-    }
     private void Update()
     {
         CheckGround();
@@ -51,6 +47,13 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         Move();
+    }
+
+    private void FindGameManager()
+    {
+        if (_gameManager != null) return;
+        
+        _gameManager = FindObjectOfType<GameManager>();
     }
 
     #region Actions
@@ -81,6 +84,7 @@ public class PlayerController : MonoBehaviour
         }
 
         Jump(jumpForce);
+        audioController.PlayJumpSound();
     }
 
     public void Jump(float force, float additionalTimeWait = 0f)
@@ -136,8 +140,14 @@ public class PlayerController : MonoBehaviour
     
     public void TakeDamage()
     {
-        _gameManager = FindObjectOfType<GameManager>();
-        _gameManager.ProcessPlayerDeath();
+        hurtSound.Play();
+        Invoke("Death", 0.5f);
+    }
+
+    public void Death()
+    {
+        FindGameManager();
+        _gameManager.ProcessPlayerDeath();       
     }
     
     #endregion
@@ -151,14 +161,6 @@ public class PlayerController : MonoBehaviour
         FlipPlayerSprite();
     }
 
-    private void OnQuit(InputValue value)
-    {
-        if (value.isPressed)
-        {
-            _gameManager.GotoMainScene();
-        }
-    }
-
     private void OnJump(InputValue value)
     {
         if (!value.isPressed) return;
@@ -166,7 +168,12 @@ public class PlayerController : MonoBehaviour
         TryJumping();
     }
 
-
+    private void OnQuit(InputValue value)
+    {
+        FindGameManager();
+        _gameManager.ReturnToMainMenu();
+    }
+    
     #endregion
 
 }
